@@ -16,6 +16,7 @@ public class TaskTrackerApplication {
 	}
 
 	@Bean
+	// 1. The Trigger: CommandLineRunner PENTING
 	public CommandLineRunner commandLineRunner(TaskService taskService) {
 		return args -> {
 			Scanner scanner = new Scanner(System.in);
@@ -25,12 +26,13 @@ public class TaskTrackerApplication {
 			System.out.println("Aplikasi untuk melacak dan mengelola tugas Anda");
 			System.out.println();
 
+			// 2. The Heartbeat: Loop while (running) PENTING
 			while (running) {
 				printMenu();
 				System.out.print("Pilih menu (1-8): ");
-				String choice = scanner.nextLine().trim();
+				String choice = scanner.nextLine().trim(); // 3. The Input: Scanner PENTING
 
-				switch (choice) {
+				switch (choice) { // 4. The Decision: Switch Statement PENTING
 					case "1":
 						addTask(taskService, scanner);
 						break;
@@ -95,13 +97,13 @@ public class TaskTrackerApplication {
 		System.out.print("Deskripsi tugas: ");
 		String description = scanner.nextLine().trim();
 
-		Task task = taskService.createTask(title, description);
+		Task task = taskService.createTask(title, description); // 5. The Action: Create Task PENTING
 		System.out.println("✓ Tugas berhasil ditambahkan dengan ID: " + task.getId());
 	}
 
 	private static void viewAllTasks(TaskService taskService) {
 		System.out.println("\n--- Semua Tugas ---");
-		List<Task> tasks = taskService.getAllTasks();
+		List<Task> tasks = taskService.getAllTasks(); // 6. The Action: Get All Tasks PENTING
 
 		if (tasks.isEmpty()) {
 			System.out.println("Belum ada tugas. Tambahkan tugas terlebih dahulu.");
