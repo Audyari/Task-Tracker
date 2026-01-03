@@ -98,7 +98,7 @@ public class TaskTrackerApplication {
 		String description = scanner.nextLine().trim();
 
 		Task task = taskService.createTask(title, description); // 5. The Action: Create Task PENTING
-		System.out.println("✓ Tugas berhasil ditambahkan dengan ID: " + task.getId());
+		System.out.println("[OK] Tugas berhasil ditambahkan dengan ID: " + task.getId());
 	}
 
 	private static void viewAllTasks(TaskService taskService) {
@@ -187,9 +187,9 @@ public class TaskTrackerApplication {
 			}
 
 			if (taskService.updateTaskStatus(id, status)) {
-				System.out.println("✓ Status tugas berhasil diubah!");
+				System.out.println("[OK] Status tugas berhasil diubah!");
 			} else {
-				System.out.println("✗ Tugas dengan ID " + id + " tidak ditemukan!");
+				System.out.println("[X] Tugas dengan ID " + id + " tidak ditemukan!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("ID harus berupa angka!");
@@ -253,9 +253,9 @@ public class TaskTrackerApplication {
 			}
 
 			if (taskService.updateTask(id, title, description, status)) {
-				System.out.println("✓ Tugas berhasil diubah!");
+				System.out.println("[OK] Tugas berhasil diubah!");
 			} else {
-				System.out.println("✗ Gagal mengubah tugas!");
+				System.out.println("[X] Gagal mengubah tugas!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("ID harus berupa angka!");
@@ -277,9 +277,9 @@ public class TaskTrackerApplication {
 			Long id = Long.parseLong(idStr);
 
 			if (taskService.deleteTask(id)) {
-				System.out.println("✓ Tugas berhasil dihapus!");
+				System.out.println("[OK] Tugas berhasil dihapus!");
 			} else {
-				System.out.println("✗ Tugas dengan ID " + id + " tidak ditemukan!");
+				System.out.println("[X] Tugas dengan ID " + id + " tidak ditemukan!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("ID harus berupa angka!");
@@ -309,7 +309,7 @@ public class TaskTrackerApplication {
 				System.out.println("Dibuat: " + task.getCreatedAt());
 				System.out.println("Diupdate: " + task.getUpdatedAt());
 			} else {
-				System.out.println("✗ Tugas dengan ID " + id + " tidak ditemukan!");
+				System.out.println("[X] Tugas dengan ID " + id + " tidak ditemukan!");
 			}
 		} catch (NumberFormatException e) {
 			System.out.println("ID harus berupa angka!");
