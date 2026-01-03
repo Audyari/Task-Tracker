@@ -1,3 +1,5 @@
 spring:
   application:
     name: TaskTracker
+  main:
+    web-application-type: none
