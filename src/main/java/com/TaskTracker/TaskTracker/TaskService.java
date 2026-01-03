@@ -2,6 +2,10 @@ package com.TaskTracker.TaskTracker;
 
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,14 +16,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
-    private static final String FILE_NAME = "tasks.txt";
+    private static final String FILE_NAME = "tasks.json";
     private List<Task> tasks; // 1. Aplikasi: In-Memory Database (List) PENTING
     private AtomicLong idCounter; // 2. Manajemen Identitas Unik (ID Generator) PENTING
     private boolean isInitialized = false; // 3. Inisialisasi
+    private ObjectMapper objectMapper; // 4. JSON Serializer
 
     public TaskService() {
         this.tasks = new ArrayList<>();
         this.idCounter = new AtomicLong(1);
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void initialize() {
@@ -102,31 +109,29 @@ public class TaskService {
     }
 
     private void saveTasks() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
-            for (Task task : tasks) {
-                writer.write(formatTask(task));
-                writer.newLine();
-            }
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(FILE_NAME), tasks);
         } catch (IOException e) {
             System.err.println("Error saving tasks: " + e.getMessage());
         }
     }
 
-    // 8. Memuat Task dari File
+    // 8. Memuat Task dari File JSON
     private void loadTasks() {
         File file = new File(FILE_NAME);
         if (!file.exists()) {
             return;
         }
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                Task task = parseTask(line);
-                if (task != null) {
-                    tasks.add(task); // 8.1. Menambahkan Task ke List PENTING
+        try {
+            List<Task> loadedTasks = objectMapper.readValue(file, new TypeReference<List<Task>>() {
+            });
+            if (loadedTasks != null) {
+                tasks.addAll(loadedTasks);
+                // Update idCounter based on the highest ID found
+                for (Task task : loadedTasks) {
                     if (task.getId() >= idCounter.get()) {
-                        idCounter.set(task.getId() + 1); // 8.2. Mengatur ID Counter PENTING
+                        idCounter.set(task.getId() + 1);
                     }
                 }
             }
@@ -135,34 +140,4 @@ public class TaskService {
         }
     }
 
-    // 9. Format Task PENTING PENTING
-    private String formatTask(Task task) {
-        return String.format("%d|%s|%s|%s|%s|%s",
-                task.getId(),
-                task.getTitle(),
-                task.getDescription(),
-                task.getStatus(),
-                task.getCreatedAt(),
-                task.getUpdatedAt());
-    }
-
-    // 10. Parse Task
-    private Task parseTask(String line) {
-        try {
-            String[] parts = line.split("\\|", 6);
-            if (parts.length == 6) {
-                Task task = new Task();
-                task.setId(Long.parseLong(parts[0]));
-                task.setTitle(parts[1]);
-                task.setDescription(parts[2]);
-                task.setStatus(Task.TaskStatus.valueOf(parts[3]));
-                task.setCreatedAt(LocalDateTime.parse(parts[4]));
-                task.setUpdatedAt(LocalDateTime.parse(parts[5]));
-                return task;
-            }
-        } catch (Exception e) {
-            System.err.println("Error parsing task: " + line);
-        }
-        return null;
-    }
 }
